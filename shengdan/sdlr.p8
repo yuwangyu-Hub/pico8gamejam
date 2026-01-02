@@ -3,7 +3,10 @@ version 43
 __lua__
 #include main.lua
 #include player.lua
-
+#include update.lua
+#include draw.lua
+#include input.lua
+#include tools.lua
 __gfx__
 00000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb0000000000000000000000000000000000000
 00000000bbbbbbbbbbbbdbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb0000000077700008888800002220000000000
