@@ -9,8 +9,8 @@ end
 function update_game()
     gametime+=0.01
     --检测游戏是否结束
-    if giftpackage.count>= 30 or gametime>=35 then
-        if giftpackage.count>=30 then
+    if #giftpackage.gifts_t>=30 or gametime>=35 then
+        if #giftpackage.gifts_t>=30 then
             sfx(3)
         elseif gametime>35 then
             sfx(4)
@@ -20,15 +20,15 @@ function update_game()
         music(0)
     end
 
-    if giftpackage.count>1 and giftpackage.count<=5 then
+    if #giftpackage.gifts_t>1 and #giftpackage.gifts_t<=5 then
         ui_c=2
-    elseif giftpackage.count>5 and giftpackage.count<=10 then
+    elseif #giftpackage.gifts_t>5 and #giftpackage.gifts_t<=10 then
         ui_c=3
-    elseif giftpackage.count>10 and giftpackage.count<=15 then
+    elseif #giftpackage.gifts_t>10 and #giftpackage.gifts_t<=15 then
         ui_c=4
-    elseif giftpackage.count>15 and giftpackage.count<=20 then
+    elseif #giftpackage.gifts_t>15 and #giftpackage.gifts_t<=20 then
         ui_c=9
-    elseif giftpackage.count>20 then
+    elseif #giftpackage.gifts_t>20 then
         ui_c=10
     end
     -- 11  10,  9,   4,    8
@@ -50,7 +50,7 @@ function update_game()
             x=5+rnd(100),
             y=-rnd(40),
             long=max(20,flr(rnd(30))),
-            spr=rnd(gifts_t),
+            spr=rnd(gifts_spr_t),
             spd=rnd(0.3)+0.02,
             c=rnd(qiqiu_c),
             mode="down",
@@ -65,6 +65,7 @@ function update_game()
     end
     inbounds(p)
     playerstate()
+    qiestate()
     for b in all(bullets) do
         b.y-=b.spd
         if b.y<0 then
@@ -118,6 +119,51 @@ function update_game()
             add(gifts_ground,g)
             del(gifts,g)
         end
+    end
+
+     --玩家搬运礼物
+    --*把硬编码的玩家搬运礼物绘制位置改为动态计算，设置g.x和g.y的值，然后绘制搬运的组
+    for i=1,#gifts_trans do
+        local x=p.x+3
+        local g=gifts_trans[i]
+        if p.last_dire==1 then
+            x=p.x-1
+        else
+            x=p.x+6
+        end
+        g.x=x
+        g.y=p.y+8-i*4
+        --spr(g.spr,x,p.y+8-i*4)
+    end
+    --企鹅搬运的礼物显示
+    if qie.state==qie.allstate.trans then
+        for i=1,#qie.trans_gifts_table do
+            local g=qie.trans_gifts_table[i]
+            if qie.dire==5 then
+                g.x=qie.x-1
+            elseif qie.dire==1 then
+                g.x=qie.x+6
+            end
+            g.y=qie.y-i*4
+        end
+    end
+
+    --企鹅偷礼物
+    if qie.transgifts>0 and #qie.trans_gifts_table<qie.transgifts then
+        for i=1,qie.transgifts do
+            add(qie.trans_gifts_table,giftpackage.gifts_t[i])
+            del(giftpackage.gifts_t,giftpackage.gifts_t[i])
+        end
+    end
+    --
+    if qie.state==qie.allstate.fright and #qie.trans_gifts_table>0 then
+        for g in all(qie.trans_gifts_table) do 
+            g.x=qie.x+(1-flr(rnd(4)))
+            g.y=118+flr(rnd(3))
+            add(gifts_ground,g)
+            del(qie.trans_gifts_table,g)
+        end
+        qie.transgifts=0
     end
     p.x+=p.spdx
 end

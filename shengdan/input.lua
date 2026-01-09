@@ -8,9 +8,9 @@ function input_menu()
 end
 
 function input_game()
-    if btnp(0) then --左
+    if btnp(0) and p.state!=p.allstate.shoot then --左
         p.dire=1
-    elseif btnp(1) then --右
+    elseif btnp(1) and p.state!=p.allstate.shoot then --右
         p.dire=5
     end 
     if (not btn(0) and not btn(1)) or ( btn(0) and btn(1)) then
@@ -20,7 +20,7 @@ function input_game()
         p.is_trans=true
         p.can_trans=false
     end
-    if btn(5) then --射击
+    if btn(5) and p.state!=p.allstate.trans then --射击
         p.is_shoot=true
         sfx(5)
     end

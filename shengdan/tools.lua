@@ -8,6 +8,14 @@ function flip_P(_dire)
         return false
     end
 end
+function flip_qie(_dire)
+    local dire=_dire
+    if dire==1 then
+        return false
+    elseif dire==5 then
+        return true
+    end
+end
 --添加子弹
 function addbullet(_sb)
     b={x=_sb.x+3,y=_sb.y,spd=2,spr=16}--这里的x和y应该是只针对spr的绘制位置
@@ -61,13 +69,16 @@ end
 --范围设置
 function inbounds(_s)
     if _s.x<0 then
-        _s.x=128
-    elseif _s.x>128 then
         _s.x=0
+    elseif _s.x>120 then
+        _s.x=120
     end
 end
 --击落检测
 function shootdown(b,g)--bullet, gift
+    if g.mode=="fall" then
+        return false
+    end
     local qiqiu={
         x=g.x-1,
         y=g.y+3-g.long,
@@ -87,5 +98,13 @@ function shootdown(b,g)--bullet, gift
         return true
     else
         return false  
+    end
+end
+
+function collide(ax,ay,aw,ah,bx,by,bw,bh)
+    if ax+aw>bx and ax<bx+bw then
+        return true
+    else
+        return false
     end
 end

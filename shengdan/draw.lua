@@ -30,6 +30,55 @@ function drawplayer()--主角绘制
     palt()
 end
 
+function drawqie()
+    local ssprx,sspry,ssprw,ssprh
+    if qie.state==qie.allstate.hide then
+        ssprx=qie.sspr.hide[1]
+        sspry=qie.sspr.hide[2]
+        ssprw=qie.sspr.hide[3]
+        ssprh=qie.sspr.hide[4]
+    elseif qie.state==qie.allstate.look then
+        ssprx=qie.sspr.look[1]
+        sspry=qie.sspr.look[2]
+        ssprw=qie.sspr.look[3]
+        ssprh=qie.sspr.look[4]
+    elseif qie.state==qie.allstate.run then
+        qie.frame=flr(time()*6)%#qie.sspr.run+1
+        ssprx=qie.sspr.run[qie.frame][1]
+        sspry=qie.sspr.run[qie.frame][2]
+        ssprw=qie.sspr.run[qie.frame][3]
+        ssprh=qie.sspr.run[qie.frame][4]
+    elseif qie.state==qie.allstate.find then
+        qie.frame=flr(time()*3)%#qie.sspr.find+1
+        ssprx=qie.sspr.find[qie.frame][1]
+        sspry=qie.sspr.find[qie.frame][2]
+        ssprw=qie.sspr.find[qie.frame][3]
+        ssprh=qie.sspr.find[qie.frame][4]
+    elseif qie.state==qie.allstate.trans then
+        qie.frame=flr(time()*3)%#qie.sspr.trans+1
+        ssprx=qie.sspr.trans[qie.frame][1]
+        sspry=qie.sspr.trans[qie.frame][2]
+        ssprw=qie.sspr.trans[qie.frame][3]
+        ssprh=qie.sspr.trans[qie.frame][4]
+    elseif qie.state==qie.allstate.fright then
+        qie.frame=flr(time()*3)%#qie.sspr.fright+1
+        ssprx=qie.sspr.fright[qie.frame][1]
+        sspry=qie.sspr.fright[qie.frame][2]
+        ssprw=qie.sspr.fright[qie.frame][3]
+        ssprh=qie.sspr.fright[qie.frame][4]
+    elseif qie.state==qie.allstate.escape then
+        qie.frame=flr(time()*6)%#qie.sspr.escape+1
+        ssprx=qie.sspr.escape[qie.frame][1]
+        sspry=qie.sspr.escape[qie.frame][2]
+        ssprw=qie.sspr.escape[qie.frame][3]
+        ssprh=qie.sspr.escape[qie.frame][4]
+    end
+    palt(12,true)
+    palt(0,false)
+    sspr(ssprx,sspry,ssprw,ssprh,qie.x,qie.y,ssprw,ssprh,flip_qie(qie.dire))
+    palt()
+end
+
 function draw_game()
     cls()
     --背景
@@ -68,17 +117,18 @@ function draw_game()
    
 
     --礼物袋绘制
-    if giftpackage.count>=7 and giftpackage.count<16 then
+    if #giftpackage.gifts_t>=7 and #giftpackage.gifts_t<16 then
         spr(giftpackage.spr[2],giftpackage.x,giftpackage.y,2,2)
-    elseif giftpackage.count>=16 and giftpackage.count<24 then
+    elseif #giftpackage.gifts_t>=16 and #giftpackage.gifts_t<24 then
         spr(giftpackage.spr[3],giftpackage.x,giftpackage.y,2,2)
-    elseif giftpackage.count>=24 then
+    elseif #giftpackage.gifts_t>=24 then
         spr(giftpackage.spr[4],giftpackage.x,giftpackage.y,2,2)
         spr(40,giftpackage.x+16,giftpackage.y,2,2)
     else
         spr(giftpackage.spr[1],giftpackage.x,giftpackage.y,2,2)
     end
 
+    
 
     --提示箭头(闪烁)
     if p.state==p.allstate.trans and check_close_giftpackage(p) then
@@ -88,6 +138,14 @@ function draw_game()
     end
     --玩家绘制
     drawplayer()
+    --企鹅绘制
+    drawqie()
+    --测试礼物袋和企鹅的碰撞
+    --rect(giftpackage.x+6,giftpackage.y,giftpackage.x+9,giftpackage.y+16,13)
+    --if qie.state==qie.allstate.run then
+        --rect(qie.x, qie.y, qie.x+qie.sspr.run[qie.frame][3], qie.y+qie.sspr.run[qie.frame][4],13)
+    --end
+
     --子弹绘制
     for b in all(bullets) do
         spr(b.spr,b.x,b.y)
@@ -99,34 +157,33 @@ function draw_game()
     for g in all(gifts_ground) do
         spr(g.spr,g.x,g.y)
     end
-    --搬运礼物绘制
-    for i=1,#gifts_trans do
-        local x=p.x+3
-        local g=gifts_trans[i]
-        if p.last_dire==1 then
-            x=p.x-1
-        else
-            x=p.x+6
+   
+    if #gifts_trans>0 then
+        for g in all(gifts_trans) do
+            spr(g.spr,g.x,g.y)
         end
-        spr(g.spr,x,p.y+8-i*4)
     end
+    if #qie.trans_gifts_table>0 then
+        for g in all(qie.trans_gifts_table) do
+            spr(g.spr,g.x,g.y)
+        end
+    end
+    
 
     --礼物ui
     spr(13,2,80)
     rect(5,77,7,45,13)
-    line(6,76,6,76-giftpackage.count,ui_c)
+    line(6,76,6,76-#giftpackage.gifts_t,ui_c)
     --倒计时ui
     spr(14,118,80)
     rect(121,77,123,45,13)
     line(122,76,122,76-min(30,flr(gametime)),time_c)
-    --print(gametime,0,0,4)
-    --print(giftpackage.count)
 end
 
 
 function draw_end()
     --胜利
-    if giftpackage.count>=30 then
+    if #giftpackage.gifts_t>=30 then 
         cls(1)
         rle1(win1,2,0)
         rle1(win2,2,24)
@@ -134,6 +191,13 @@ function draw_end()
         rle1(win4,2,72)
         rle1(win5,2,96)
         rle1(win6,2,120)
+    elseif qie.findgifts>=5 then
+        cls(0)
+        rle1(lose_qiewin1,2,0)
+        rle1(lose_qiewin2,2,24)
+        rle1(lose_qiewin3,2,48)
+        rle1(lose_qiewin4,2,72)
+        rle1(lose_qiewin5,2,96)
     else
         rle1(lose1,2,0)
         rle1(lose2,2,24)
@@ -141,6 +205,5 @@ function draw_end()
         rle1(lose4,2,72)
     end
     --提示重新开始
-    print("press ⬆️ to restart",30,110,blink())
-
+    print("press ⬆️ to restart",27,118,blink())
 end

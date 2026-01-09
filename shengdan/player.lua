@@ -12,7 +12,6 @@ function playerstate()
                 p.state=p.allstate.shoot
             end
             if p.is_trans then
-                
                 p.state=p.allstate.trans
             end
         end,
@@ -21,7 +20,9 @@ function playerstate()
             if p.dire==0 then
                 p.state=p.allstate.idle
             else
+                
                 p.spdx=dirx[p.dire]*p.run_spd
+                
             end
             if p.is_shoot then
                 p.state=p.allstate.shoot
@@ -63,8 +64,10 @@ function playerstate()
             if p.isgitfsdown then
                 p.state=p.allstate.idle
                 p.isgitfsdown=false
-                giftpackage.count+=#gifts_trans
-                gifts_trans={}
+                for g in all(gifts_trans) do
+                    add(giftpackage.gifts_t,g)
+                    del(gifts_trans,g)
+                end
             end
             
         end,
@@ -98,7 +101,6 @@ function rle1(s,x0,y,tr)
 	 	x+=len if(x>mw) x=x0 y+=1
 	end
 end
-
 --闪烁工具，返回闪烁的颜色动画
 function blink() 
 	local blink_anim={5,5,5,5,5,5,5,5,6,6,7,7,6,6,5,5}
